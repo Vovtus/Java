@@ -2,13 +2,13 @@ package org.example;
 
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
+
 import static java.lang.System.exit;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
 public class Main {
-    public static void main(String[] args) {
-        String menu = """
+    private static final String menu = """
                         >>> Меню:
                         1. Добавить задачу
                         2. Показать все задапчи
@@ -18,51 +18,61 @@ public class Main {
                 
                         Выберите пункт меню:
                 """;
+    private static final String [] task = new String[100];
+    private static final boolean [] taskStatus = new boolean[100];
+    private static final Scanner console = new Scanner(System.in);
+    private static final Set<String> COMMANDS = Set.of("1", "2", "3", "4", "0");
+    private static int taskCount;
+    public static void handleExit() {
+        System.out.println("Выход");
+        System.exit(0);
+    }
+    public static void handleNewTask(){
+        System.out.println("Введите описание задачи:");
+        task[taskCount] = console.nextLine();
+        taskCount++;
+        taskStatus[taskCount] = false;
+        System.out.println("Задача добавлена!");
+    }
+    public static boolean isTaskListEmpty(){
+        if (taskCount == 0){
+            System.out.println("Список задач пуст");
+            return true;
+        }
+        return false;
+    }
 
-        String [] task = new String[100];
-        boolean [] taskStatus = new boolean[100];
-        int taskCount = 0;
+    public static void main(String[] args) {
+
         while (true) {
-            Scanner console = new Scanner(System.in);
             System.out.println(menu);
             String input = console.nextLine();
-            int command;
-            if (input.equals("1") || input.equals("2") || input.equals("3") || input.equals("4") || input.equals("0")) {
-                command = Integer.parseInt(input);
-
+            int command = Integer.parseInt(input);
+            if (COMMANDS.contains(input)) {
                 if (command == 0) {
-                    System.out.println("Выход");
-                    System.exit(0);
-                } else if (command == 1) {
-                    if (taskCount >= 100){
-                        System.out.println("Список задач переполнен");
-
-                    }
-                    else {
-                        System.out.println("Введите описание задачи:");
-                        task[taskCount] = console.nextLine();
-                        taskCount++;
-                        taskStatus[taskCount] = false;
-                        System.out.println("Задача добавлена!");
-                    }
-
+                    handleExit();
                 }
-                else if (command==2) {
-                    if (taskCount == 0) {
-                        System.out.println("Список задач пуст");
+                else if (command == 1) {
+                    if (taskCount >= 100) {
+                        System.out.println("Список задач переполнен");
+                        continue;
                     }
-                    else {
-                        System.out.println("Список задач:");
-                        for (int i = 0; i < taskCount; i++){
-                            String status = taskStatus[i] ? "[X]" : "[ ]";
-                            System.out.println(i+1 + ". " + status +" "+task[i] );
-                        }
+                    handleNewTask();
+                }
+                else if (command == 2) {
+                    if (isTaskListEmpty())
+                    {
+                        continue;
                     }
-
+                    System.out.println("Список задач:");
+                    for (int i = 0; i < taskCount; i++) {
+                        String status = taskStatus[i] ? "[X]" : "[ ]";
+                        System.out.println(i + 1 + ". " + status + " " + task[i]);
+                    }
                 }
                 else if (command == 3) {
-                    if (taskCount == 0){
-                        System.out.println("Список задач пуст");
+                    if (isTaskListEmpty())
+                    {
                         continue;
                     }
                     System.out.println("Введите номер задачи для удаления:");
@@ -83,19 +93,17 @@ public class Main {
                         taskCount--;
                         System.out.println("Задача \"" + removedTask + "\" удалена ");
 
+                    } catch (NumberFormatException e) {
+                        System.out.println("Введите число, а не текст");
                     }
-                    catch (NumberFormatException e) {
-                        System.out.println("Введите число, а не текст" );
-                    }
-
                 }
                 else if (command == 4) {
-                    if (taskCount == 0){
-                        System.out.println("Список задач пуст");
+                    if (isTaskListEmpty())
+                    {
                         continue;
                     }
                     System.out.println("Введите номер задачи для отметки:");
-                    String mark  = console.nextLine();
+                    String mark = console.nextLine();
                     try {
                         int checkTask = Integer.parseInt(mark);
                         if (checkTask < 1 || checkTask > taskCount) {
@@ -103,7 +111,7 @@ public class Main {
                             continue;
                         }
                         int index = checkTask - 1;
-                        if (taskStatus[index]){
+                        if (taskStatus[index]) {
                             System.out.println("Задача уже отмечена как выполненная");
                             continue;
 
@@ -112,21 +120,17 @@ public class Main {
 
                         System.out.println("Задача \"" + task[index] + "\" отмечена как выполненная!");
 
-                    }
-                    catch (NumberFormatException e) {
-                        System.out.println("Введите число, а не текст" );
+                    } catch (NumberFormatException e) {
+                        System.out.println("Введите число, а не текст");
                     }
 
+
+                } else {
+                    System.out.println("Введите цифру от 0 до 4");
 
                 }
-
-            } else {
-                System.out.println("Введите цифру от 0 до 4");
-
             }
-        }
 
-    }
+        }}}
 
 
-}
