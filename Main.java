@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import static java.lang.System.exit;
@@ -19,10 +20,13 @@ public class Main {
                 
                         Выберите пункт меню:
                 """;
-    public static final String [] task = new String[100];
-    public static  final boolean [] taskStatus = new boolean[100];
+    Task task  = new Task (100);
+    TaskStatus taskStatus[] = new TaskStatus;
+    TaskCount taskCount = new TaskCount(0);
+    //public static final String [] task = new String[100];
+    //public static  final boolean [] taskStatus = new boolean[100];
     public static final Scanner console = new Scanner(System.in);
-    public static int taskCount = 0;
+    //public static int taskCount = 0;
     public static boolean isTaskListEmpty() {
         if(taskCount == 0) {
             System.out.println("Список задач пуст");
@@ -36,19 +40,14 @@ public class Main {
             System.out.println("Выход");
             System.exit(0);
     }
-    public static void handleNewTask(){
-        System.out.println("Введите описание задачи:");
-        task[taskCount] = console.nextLine();
-        taskCount++;
-        taskStatus[taskCount] = false;
-        System.out.println("Задача добавлена!");
-
-    }
 
 
 
     public static int command;
-    public static void main(String[] args) {
+    public static <Task> void main(String[] args) {
+
+
+        TaskHandler taskHandler = new TaskHandler(task, taskStatus, taskCount);
 
         while (true) {
             System.out.println(menu);
@@ -65,18 +64,18 @@ public class Main {
                         System.out.println("Список задач переполнен");
                         continue;
                     }
-                        handleNewTask();
-
-
+                        System.out.println("Введите описание задачи:");
+                        task[taskCount] = console.nextLine();
+                        TaskHandler.handleNewTask();
+                        System.out.println("Задача добавлена!");
                 }
                 else if (command==2) {
                     if (isTaskListEmpty()) {
                         continue;
                     }
-                        System.out.println("Список задач:");
-                        for (int i = 0; i < taskCount; i++){
+                        for (int i = 0; i < taskCount; i++) {
                             String status = taskStatus[i] ? "[X]" : "[ ]";
-                            System.out.println(i+1 + ". " + status +" "+task[i] );
+                            System.out.println((i+1) + ". " + status + " " + task[i]);
                         }
                 }
                 else if (command == 3) {
