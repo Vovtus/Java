@@ -9,45 +9,60 @@ public class Task {
     private final LocalDateTime deadline;     // Дедлайн задачи
     private Priority priority;               // Приоритет
     private TaskStatus taskStatus;          // Статус
-public Task( int id, String title, String description, LocalDateTime deadline, Priority priority, TaskStatus taskStatus){
-    this.id=id;
-    this.title=title;
-    this.deadline=deadline;
-    this.description=description;
-    this.priority=priority;
-    this.taskStatus=taskStatus;
-}
-    public int getId() {return id;}
+
+    public Task(int id, String title, String description, LocalDateTime deadline, Priority priority, TaskStatus taskStatus) {
+        this.id = id;
+        this.title = title;
+        this.deadline = deadline;
+        this.description = description;
+        this.priority = priority;
+        this.taskStatus = taskStatus;
+    }
+
+    public int getId() {
+        return id;
+    }
 
     public String getTitle() {
-        return  title;
+        return title;
     }
 
     public String getDescription() {
-        return  description;
+        return description;
     }
-    public void setDescription(String description){
+
+    public void setDescription(String description) {
         this.description = description;
     }
 
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
-    public Priority getPriority(){
-    return priority;
+
+    public Priority getPriority() {
+        return priority;
     }
 
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
     }
-    public TaskStatus getTaskStatus(){
-    return taskStatus;
+
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
     }
 
     public LocalDateTime getDeadline() {
         return deadline;
     }
+
+    @Override
+    public String toString() {
+
+        return "Id: " + id + " Задача: " + title + " Описапние задачи: " + description + " Дэдлайн: " + deadline + " Приоритет: " + priority + " Статус: " +  taskStatus;
+
+    }
 }
+
 
 
 
