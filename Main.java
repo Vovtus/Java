@@ -1,135 +1,175 @@
 package org.example;
 
-import java.util.Arrays;
-import java.util.Scanner;
+import java.time.LocalDateTime;
 import java.util.Set;
-
-import static java.lang.System.exit;
+import java.util.Scanner;
 
 
 public class Main {
-    private static final String menu = """
-                        >>> Меню:
-                        1. Добавить задачу
-                        2. Показать все задапчи
-                        3. Удалить задачу (по номеру)
-                        4. Отметить задачу как выполненную
-                        0. Выход
-                
-                        Выберите пункт меню:
-                """;
-    private static final String [] task = new String[100];
-    private static final boolean [] taskStatus = new boolean[100];
-    private static final Scanner console = new Scanner(System.in);
+    public static final Scanner console = new Scanner(System.in);
+    public static int id = 1;
     private static final Set<String> COMMANDS = Set.of("1", "2", "3", "4", "0");
-    private static int taskCount;
-    public static void handleExit() {
-        System.out.println("Выход");
-        System.exit(0);
-    }
-    public static void handleNewTask(){
-        System.out.println("Введите описание задачи:");
-        task[taskCount] = console.nextLine();
-        taskCount++;
-        taskStatus[taskCount] = false;
-        System.out.println("Задача добавлена!");
-    }
-    public static boolean isTaskListEmpty(){
-        if (taskCount == 0){
+    private static final String menu = """
+                    ____________________________________
+                    >>> Меню:
+                    1. Добавить задачу
+                    2. Показать все задачи
+                    3. Удалить задачу (по номеру)
+                    4. Изменить статус задачи
+                    0. Выход
+            
+                    Выберите пункт меню:
+                    _____________________________________
+            """;
+    static TaskHandler taskHandler = new TaskHandler();
+
+    public static boolean isTaskListEmpty() {
+        if (taskHandler.isEmpty()) {
             System.out.println("Список задач пуст");
             return true;
         }
         return false;
     }
-    public static void main(String[] args) {
 
+    public static void handleExit() {
+        System.out.println("Выход");
+        System.exit(0);
+    }
+
+    public static void getTasks() {
+        int listSize = taskHandler.getSize();
+        for (int i = 0; i < listSize; i++) {
+            System.out.println(taskHandler.getTasks().get(i));
+        }
+    }
+
+    public static void main(String[] args) {
         while (true) {
             System.out.println(menu);
-            String input = console.nextLine();
-            int command = Integer.parseInt(input);
-            if (COMMANDS.contains(input)) {
+            String inputTask = console.nextLine();
+            if (COMMANDS.contains(inputTask)) {
+                int command = Integer.parseInt(inputTask);
                 if (command == 0) {
                     handleExit();
-                }
-                else if (command == 1) {
-                    if (taskCount >= 100) {
-                        System.out.println("Список задач переполнен");
+                } else if (command == 1) {
+                    System.out.println("Введите название задачи: ");
+                    String title = console.nextLine();
+                    System.out.println("Введите описание задачи: ");
+                    String description = console.nextLine();
+                    while (true) {
+                        try {
+                            System.out.println("Укажите через сколько дней дэдлайн");
+                            String day = console.nextLine();
+                            int days = Integer.parseInt(day);
+                            LocalDateTime deadline = LocalDateTime.now().plusDays(days);
+                            System.out.println("""
+                                            Укажите приоритет задачи:
+                                            1. LOW - низкий
+                                            2. MEDIUM - средний
+                                            3. HIGH - высокий
+                                    """);
+                            Priority priority;
+                            String set = console.nextLine();
+                            int setPriority = Integer.parseInt(set);
+                            if (setPriority < 1 || setPriority > 3) {
+                                System.out.println("Выберите корректный пункт меню");
+                                continue;
+                            }
+                            if (setPriority == 1) {
+                                priority = Priority.LOW;
+                            } else if (setPriority == 2) {
+                                priority = Priority.MEDIUM;
+                            } else {
+                                priority = Priority.HIGH;
+                            }
+                            TaskStatus status = TaskStatus.PENDING;
+                            Task newTask = new Task(id, title, description, deadline, priority, status);
+                            taskHandler.handleNewTask(newTask);
+                            id++;
+                            System.out.println("Задача добавлена");
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Введите число, а не текст");
+                        }
+                    }
+                } else if (command == 2) {
+                    if (isTaskListEmpty()) {
                         continue;
                     }
-                    handleNewTask();
-                }
-                else if (command == 2) {
-                    if (isTaskListEmpty())
-                    {
+                    getTasks();
+                } else if (command == 3) {
+                    if (isTaskListEmpty()) {
                         continue;
                     }
-                    System.out.println("Список задач:");
-                    for (int i = 0; i < taskCount; i++) {
-                        String status = taskStatus[i] ? "[X]" : "[ ]";
-                        System.out.println(i + 1 + ". " + status + " " + task[i]);
+                    while (true) {
+                        getTasks();
+                        System.out.println("Введите номер задачи для удаления:");
+                        String in = console.nextLine();
+                        try {
+                            int taskNumber = Integer.parseInt(in);
+                            boolean checkTask = taskHandler.deleteTask(taskNumber);
+                            if (checkTask) {
+                                System.out.println("Задача удалена");
+                                break;
+                            } else {
+                                System.out.println("Задача с номером " + taskNumber + " отсутствует");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Введите число, а не текст");
+                        }
                     }
-                }
-                else if (command == 3) {
-                    if (isTaskListEmpty())
-                    {
+                } else if (command == 4) {
+                    if (isTaskListEmpty()) {
                         continue;
                     }
-                    System.out.println("Введите номер задачи для удаления:");
-                    String in = console.nextLine();
-                    try {
-                        int taskNumber = Integer.parseInt(in);
-                        if (taskNumber < 1 || taskNumber > taskCount) {
-                            System.out.println("Введите корректный номер задачи");
-                            continue;
-                        }
-                        int index = taskNumber - 1;
-                        String removedTask = task[index];
-                        for (int i = index; i < taskCount - 1; i++) {
-                            task[i] = task[i + 1];
-                            taskStatus[i] = taskStatus[i + 1];
+                    while (true) {
+                        getTasks();
+                        System.out.println("Введите номер задачи для изменения статуса: ");
+                        String in = console.nextLine();
+                        TaskStatus taskStatus;
+                        try {
+                            int taskNumber = Integer.parseInt(in);
+                            Task found = taskHandler.findTaskById(taskNumber);
+                            if (found == null) {
+                                System.out.println("Задача с номером " + taskNumber + " отсутствует");
+                            } else {
 
+                                System.out.println("""
+                                        Выберите статус:
+                                        1. PENDING - Задача не начата
+                                        2. IN_PROGRESS - Задача в процессе
+                                        3. COMPLETED - Задача выполнена
+                                        """);
+                                String set = console.nextLine();
+                                int input = Integer.parseInt(set);
+                                if (input < 1 || input > 3) {
+                                    System.out.println("Выберите корректный пункт меню");
+                                    continue;
+                                }
+                                if (input == 1) {
+                                    taskStatus = TaskStatus.PENDING;
+                                } else if (input == 2) {
+                                    taskStatus = TaskStatus.IN_PROGRESS;
+                                } else {
+                                    taskStatus = TaskStatus.COMPLETED;
+                                }
+                                boolean ok = taskHandler.changeStatus(input, taskStatus);
+                                if (ok) {
+                                    System.out.println("Статус задачи изменён");
+                                    break;
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Введите число, а не текст");
                         }
-                        taskCount--;
-                        System.out.println("Задача \"" + removedTask + "\" удалена ");
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("Введите число, а не текст");
                     }
-                }
-                else if (command == 4) {
-                    if (isTaskListEmpty())
-                    {
-                        continue;
-                    }
-                    System.out.println("Введите номер задачи для отметки:");
-                    String mark = console.nextLine();
-                    try {
-                        int checkTask = Integer.parseInt(mark);
-                        if (checkTask < 1 || checkTask > taskCount) {
-                            System.out.println("Введите корректный номер задачи");
-                            continue;
-                        }
-                        int index = checkTask - 1;
-                        if (taskStatus[index]) {
-                            System.out.println("Задача уже отмечена как выполненная");
-                            continue;
-
-                        }
-                        taskStatus[index] = true;
-
-                        System.out.println("Задача \"" + task[index] + "\" отмечена как выполненная!");
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("Введите число, а не текст");
-                    }
-
-
                 } else {
                     System.out.println("Введите цифру от 0 до 4");
-
                 }
             }
+        }
+    }
+}
 
-        }}}
 
 
