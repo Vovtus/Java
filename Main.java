@@ -6,6 +6,9 @@ import java.util.Scanner;
 
 
 public class Main {
+    public static final Scanner console = new Scanner(System.in);
+    public static int id = 1;
+    private static final Set<String> COMMANDS = Set.of("1", "2", "3", "4", "0");
     private static final String menu = """
                     ____________________________________
                     >>> Меню:
@@ -19,8 +22,6 @@ public class Main {
                     _____________________________________
             """;
     static TaskHandler taskHandler = new TaskHandler();
-    public static final Scanner console = new Scanner(System.in);
-    public static int id = 1;
 
     public static boolean isTaskListEmpty() {
         if (taskHandler.isEmpty()) {
@@ -29,8 +30,6 @@ public class Main {
         }
         return false;
     }
-
-    private static final Set<String> COMMANDS = Set.of("1", "2", "3", "4", "0");
 
     public static void handleExit() {
         System.out.println("Выход");
