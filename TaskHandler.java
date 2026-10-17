@@ -1,10 +1,13 @@
 package org.example;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 
 class TaskHandler {
+    private int nextId = 1;
+
 
     private List<Task> tasks;
 
@@ -12,9 +15,11 @@ class TaskHandler {
         this.tasks = new ArrayList<>();
     }
 
-    public void handleNewTask(Task task) { // Добавляем задачу если 1
-        tasks.add(task);
 
+    public void handleNewTask(Task task) {// Добавляем задачу если 1
+        task.setId(nextId);
+        nextId++;
+        tasks.add(task);
     }
 
     public List<Task> getTasks() {// возвращаем список задач, если 2
@@ -49,6 +54,7 @@ class TaskHandler {
         }
         found.setTaskStatus(newStatus);
         return true;
+
     }
 
     public boolean isEmpty() {
